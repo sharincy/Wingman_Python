@@ -128,6 +128,13 @@ class Main(BaseApp):
             return
 
         category = simpledialog.askstring("Category", "Enter task category:")
+        if category is None:  # Check if the user clicked 'Cancel'
+            return
+
+        if not category.strip():  # Check if the category is empty or contains only spaces
+            messagebox.showwarning("Warning", "Category name cannot be empty or contain only spaces!")
+            return
+
         try:
             task = Task(name=task_name, category=category)
             self.list_box.insert(tk.END, task.name)
@@ -137,6 +144,7 @@ class Main(BaseApp):
             self.refresh_tree_view()  # Refresh the tree view after addition
         except ValueError as e:
             messagebox.showerror("Error", str(e))
+
 
     def save_to_file(self, task):
         try:
@@ -176,8 +184,10 @@ class Main(BaseApp):
 
             try:
                 destination = f"{task_name}_{category}.txt" if category else f"{task_name}.txt"
-                with open(file_path, "r") as source_file, open(destination, "w") as dest_file:
+                with open(file_path, "r") as source_file:
                     content = source_file.read()
+
+                with open(destination, "w") as dest_file:
                     dest_file.write(content)
 
                 self.list_box.insert(tk.END, task_name)
@@ -186,10 +196,14 @@ class Main(BaseApp):
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to import {file_name}: {str(e)}")
 
+
     def view_details(self):
         selected_task_index = self.list_box.curselection()
         if selected_task_index:
             selected_task = self.list_box.get(selected_task_index)
+            category = self.get_category(selected_task)  # Get the category for the selected task
+            file_name = f"{selected_task}_{category}.txt" if category else f"{selected_task}.txt"  # Form the correct file name
+
             details_window = tk.Toplevel(self)
             details_window.title(f"Details of {selected_task}")
             details_window.geometry("1000x800")
@@ -203,7 +217,6 @@ class Main(BaseApp):
             text_area = tk.Text(details_window, font=self.main_font, bg="#FFFFFF", fg="#000000", relief='sunken')
             text_area.pack(expand=True, fill="both", padx=10, pady=5, anchor='n')
 
-            file_name = f"{selected_task}.txt"
             if os.path.exists(file_name):
                 with open(file_name, "r") as file:
                     content = file.read()
