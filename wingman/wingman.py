@@ -28,9 +28,17 @@ class BaseApp(tk.Tk):
                                 command=self.add_task)
         self.add_button.pack(expand=True, fill="both", padx=10, pady=5)
 
+        self.delete_button = tk.Button(label_frame, text="Delete Task", font=self.body_font,
+                                command=self.delete_task)
+        self.delete_button.pack(expand=True, fill="both", padx=10, pady=5)
+
         self.view_button = tk.Button(label_frame, text="View File Details", font=self.body_font,
                                 command=self.view_details)
         self.view_button.pack(expand=True, fill="both", padx=10, pady=5)
+
+        self.import_button = tk.Button(label_frame, text="Import Text File", font=self.body_font,
+                                command=self.import_task)
+        self.import_button.pack(expand=True, fill="both", padx=10, pady=5)
 
     def add_task(self):
         pass
@@ -38,26 +46,43 @@ class BaseApp(tk.Tk):
     def save_to_file(self, task):
         pass
 
-    def load_tasks(self):
+    def load_tasks(self):   
         pass
 
     def view_details(self):
         pass
 
-class App(BaseApp):
+class Main(BaseApp):
     def __init__(self):
         super().__init__()
         self.load_tasks()
 
+    def delete_task(self):
+        selected_task_index = self.list_box.curselection()
+        if selected_task_index:
+            selected_task = self.list_box.get(selected_task_index)
+            confirmation = messagebox.askyesno("Confirmation", f"Do you want to delete {selected_task}?")
+            if confirmation:
+                try:
+                    file_name = f"{selected_task}.txt"
+                    os.remove(file_name)
+                    self.list_box.delete(selected_task_index)
+                    messagebox.showinfo("Success", f"{selected_task} has been deleted!")
+                except Exception as e:
+                    messagebox.showerror("Error", f"Failed to delete {selected_task}: {str(e)}")
+        else:
+            messagebox.showwarning("Warning", "Please select a task to delete!")
+
     def add_task(self):
         task = self.entry_box.get()
         try:
-            if not task.strip():  # Check if the task contains only whitespace characters
+            if not task.strip():
                 raise ValueError("Task name cannot be empty or contain only spaces!")
             
             self.list_box.insert(tk.END, task)
             self.entry_box.delete(0, tk.END)
             self.save_to_file(task)
+            messagebox.showinfo("Success", f"{task} has been created!")
         except ValueError as e:
             messagebox.showerror("Error", str(e))
 
@@ -80,9 +105,32 @@ class App(BaseApp):
                 task = os.path.splitext(file_name)[0]
                 self.list_box.insert(tk.END, task)
 
+    def import_task(self):
+        # Prompt the user to select a file
+        file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
+
+        if file_path:
+            # Extract the file name
+            file_name = os.path.basename(file_path)
+            task_name = os.path.splitext(file_name)[0]
+
+            try:
+                # Copy the file to your application's folder
+                destination = f"{task_name}.txt"
+                with open(file_path, "r") as source_file, open(destination, "w") as dest_file:
+                    content = source_file.read()
+                    dest_file.write(content)
+
+                # Update the list box to display the newly imported task
+                self.list_box.insert(tk.END, task_name)
+                messagebox.showinfo("Success", f"{task_name} has been imported!")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to import {file_name}: {str(e)}")
+
     def view_details(self):
-        selected_task = self.list_box.get(tk.ACTIVE)
-        if selected_task:
+        selected_task_index = self.list_box.curselection()
+        if selected_task_index:
+            selected_task = self.list_box.get(selected_task_index)
             details_window = tk.Toplevel(self)
             details_window.title(f"Details of {selected_task}")
             details_window.geometry("1000x800")  # Set a fixed size for the window
@@ -106,11 +154,14 @@ class App(BaseApp):
                 content = text_area.get("1.0", tk.END)
                 with open(file_name, "w") as file:
                     file.write(content)
+                messagebox.showinfo("Saved", "The content has been saved!")
 
             save_button = tk.Button(details_window, text="Save Content", font=self.body_font,
                                     command=save_content)
             save_button.pack(padx=10, pady=5, anchor='s')  # Anchor button to the bottom
+        else:
+            messagebox.showwarning("Warning", "Please select a task to view details!")
 
 if __name__ == "__main__":
-    app = App()
+    app = Main()
     app.mainloop()
