@@ -5,7 +5,7 @@ import os
 class BaseApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Wingman")
+        self.title("Wingman - Your friend")
         self.configure(bg="#D4F1F4")
         self.geometry("")
 
@@ -24,12 +24,12 @@ class BaseApp(tk.Tk):
         label_frame = tk.LabelFrame(self, text="Options", font=self.body_font, bg="#D4F1F4")
         label_frame.pack(expand=True, fill="both", padx=10, pady=5)
         
-        self.add_button = tk.Button(label_frame, text="Add Task", font=self.body_font, bg='#FA8072', fg='#FFFFFF',
-                                activebackground='#DD4124', relief='groove', command=self.add_task)
+        self.add_button = tk.Button(label_frame, text="Add Task", font=self.body_font, 
+                                command=self.add_task)
         self.add_button.pack(expand=True, fill="both", padx=10, pady=5)
 
-        self.view_button = tk.Button(label_frame, text="View File Details", font=self.body_font, bg='#FA8072', fg='#FFFFFF',
-                                activebackground='#DD4124', relief='groove', command=self.view_details)
+        self.view_button = tk.Button(label_frame, text="View File Details", font=self.body_font,
+                                command=self.view_details)
         self.view_button.pack(expand=True, fill="both", padx=10, pady=5)
 
     def add_task(self):
@@ -107,8 +107,8 @@ class App(BaseApp):
                 with open(file_name, "w") as file:
                     file.write(content)
 
-            save_button = tk.Button(details_window, text="Save Content", font=self.body_font, bg='#FA8072', fg='#FFFFFF',
-                                    activebackground='#DD4124', relief='groove', command=save_content)
+            save_button = tk.Button(details_window, text="Save Content", font=self.body_font,
+                                    command=save_content)
             save_button.pack(padx=10, pady=5, anchor='s')  # Anchor button to the bottom
 
 if __name__ == "__main__":
