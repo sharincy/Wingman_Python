@@ -3,11 +3,17 @@ from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import collections
 import matplotlib.pyplot as plt
+from abc import ABC, abstractmethod
 
-class PieChart(object):
+class Chart(ABC):
     def __init__(self, categories_count):
         self.categories_count = categories_count
 
+    @abstractmethod
+    def generate_chart(self):
+        pass
+
+class PieChart(Chart):
     def generate_chart(self):
         if self.categories_count:
             categories = list(self.categories_count.keys())
@@ -22,10 +28,7 @@ class PieChart(object):
             messagebox.showwarning("Warning", "No data to generate a pie chart!")
 
 
-class BarGraph(object):
-    def __init__(self, categories_count):
-        self.categories_count = categories_count
-
+class BarGraph(Chart):
     def generate_chart(self):
         if self.categories_count:
             categories = list(self.categories_count.keys())
@@ -47,13 +50,9 @@ class BarGraph(object):
         else:
             messagebox.showwarning("Warning", "No data to generate a bar graph!")
 
-
 class Task(object):
-    def __init__(self, name, status="Pending", due_date=None, priority="Medium", category=None):
+    def __init__(self, name, category=None):
         self.name = name
-        self.status = status
-        self.due_date = due_date
-        self.priority = priority
         self.category = category
 
 class BaseApp(tk.Tk):
@@ -170,6 +169,10 @@ class Main(BaseApp):
             messagebox.showwarning("Warning", "Category name cannot be empty or contain only spaces!")
             return
 
+        if self.task_exists(task_name):
+            messagebox.showwarning("Warning", f"Task '{task_name}' already exists!")
+            return
+
         try:
             task = Task(name=task_name, category=category)
             self.list_box.insert(tk.END, task.name)
@@ -179,6 +182,11 @@ class Main(BaseApp):
             self.refresh_tree_view()  # Refresh the tree view after addition
         except ValueError as e:
             messagebox.showerror("Error", str(e))
+
+    def task_exists(self, task_name):
+        existing_tasks = self.list_box.get(0, tk.END)
+        return task_name in existing_tasks
+
 
 
     def save_to_file(self, task):
