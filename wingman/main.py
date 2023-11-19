@@ -4,6 +4,50 @@ import os
 import collections
 import matplotlib.pyplot as plt
 
+class PieChart:
+    def __init__(self, categories_count):
+        self.categories_count = categories_count
+
+    def generate_chart(self):
+        if self.categories_count:
+            categories = list(self.categories_count.keys())
+            counts = list(self.categories_count.values())
+
+            plt.figure(figsize=(8, 6))
+            plt.pie(counts, labels=categories, autopct='%1.1f%%', startangle=140)
+            plt.axis('equal')
+            plt.title('Category Distribution - Pie Chart')
+            plt.show()
+        else:
+            messagebox.showwarning("Warning", "No data to generate a pie chart!")
+
+
+class BarGraph:
+    def __init__(self, categories_count):
+        self.categories_count = categories_count
+
+    def generate_chart(self):
+        if self.categories_count:
+            categories = list(self.categories_count.keys())
+            counts = list(self.categories_count.values())
+
+            colors = plt.cm.tab20c.colors[:len(categories)]
+
+            plt.figure(figsize=(10, 6))
+            bars = plt.bar(categories, counts, color=colors)
+            plt.xlabel('Categories')
+            plt.ylabel('Counts')
+            plt.title('Category Distribution - Bar Graph')
+            plt.xticks(rotation=45)
+
+            plt.legend(bars, categories)
+
+            plt.tight_layout()
+            plt.show()
+        else:
+            messagebox.showwarning("Warning", "No data to generate a bar graph!")
+
+
 class Task:
     def __init__(self, name, status="Pending", due_date=None, priority="Medium", category=None):
         self.name = name
@@ -227,50 +271,18 @@ class Main(BaseApp):
 
     def generate_chart(self):
         selected_chart = self.chart_type_var.get()
+        categories_count = self.get_categories_count()
+
+        chart = None
         if selected_chart == "Pie Chart":
-            self.generate_pie_chart()
+            chart = PieChart(categories_count)
         elif selected_chart == "Bar Graph":
-            self.generate_bar_graph()
+            chart = BarGraph(categories_count)
+
+        if chart:
+            chart.generate_chart()
         else:
             messagebox.showwarning("Warning", "Please select a chart type!")
-
-    def generate_pie_chart(self):
-        categories_count = self.get_categories_count()
-        if categories_count:
-            categories = list(categories_count.keys())
-            counts = list(categories_count.values())
-
-            plt.figure(figsize=(8, 6))
-            plt.pie(counts, labels=categories, autopct='%1.1f%%', startangle=140)
-            plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-            plt.title('Category Distribution')
-            plt.show()
-        else:
-            messagebox.showwarning("Warning", "No data to generate a pie chart!")
-
-    def generate_bar_graph(self):
-        categories_count = self.get_categories_count()
-        if categories_count:
-            categories = list(categories_count.keys())
-            counts = list(categories_count.values())
-
-            # Define a color palette for the bars
-            colors = plt.cm.tab20c.colors[:len(categories)]  # Choose a colormap and extract colors
-            
-            plt.figure(figsize=(10, 6))
-            bars = plt.bar(categories, counts, color=colors)
-            plt.xlabel('Categories')
-            plt.ylabel('Counts')
-            plt.title('Category Distribution')
-            plt.xticks(rotation=45)
-            
-            # Add a legend for the colors and categories
-            plt.legend(bars, categories)
-            
-            plt.tight_layout()
-            plt.show()
-        else:
-            messagebox.showwarning("Warning", "No data to generate a bar graph!")
 
     def get_categories_count(self):
         categories_count = collections.defaultdict(int)
