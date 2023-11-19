@@ -168,6 +168,7 @@ class Main(BaseApp):
         if not category.strip():  # Check if the category is empty or contains only spaces
             messagebox.showwarning("Warning", "Category name cannot be empty or contain only spaces!")
             return
+        category = " ".join(word.capitalize() for word in category.strip().split())
 
         if self.task_exists(task_name):
             messagebox.showwarning("Warning", f"Task '{task_name}' already exists!")
