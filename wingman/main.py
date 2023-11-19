@@ -282,17 +282,21 @@ class Main(BaseApp):
         selected_chart = self.chart_type_var.get()
         categories_count = self.get_categories_count()
 
-        chart = None
-        if selected_chart == "Pie Chart":
-            chart = PieChart(categories_count)
-        elif selected_chart == "Bar Graph":
-            chart = BarGraph(categories_count)
-
-        if chart:
+        try:
+            if selected_chart == "Pie Chart":
+                chart = PieChart(categories_count)
+            elif selected_chart == "Bar Graph":
+                chart = BarGraph(categories_count)
+            else:
+                raise ValueError("Invalid chart type selected!")
+        
             chart.generate_chart()
-        else:
-            messagebox.showwarning("Warning", "Please select a chart type!")
 
+        except ValueError as e:
+            messagebox.showwarning("Warning", str(e))
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+            
     def get_categories_count(self):
         categories_count = collections.defaultdict(int)
         for file_name in os.listdir():
