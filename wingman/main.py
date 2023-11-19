@@ -4,7 +4,7 @@ import os
 import collections
 import matplotlib.pyplot as plt
 
-class PieChart:
+class PieChart(object):
     def __init__(self, categories_count):
         self.categories_count = categories_count
 
@@ -22,7 +22,7 @@ class PieChart:
             messagebox.showwarning("Warning", "No data to generate a pie chart!")
 
 
-class BarGraph:
+class BarGraph(object):
     def __init__(self, categories_count):
         self.categories_count = categories_count
 
@@ -48,7 +48,7 @@ class BarGraph:
             messagebox.showwarning("Warning", "No data to generate a bar graph!")
 
 
-class Task:
+class Task(object):
     def __init__(self, name, status="Pending", due_date=None, priority="Medium", category=None):
         self.name = name
         self.status = status
